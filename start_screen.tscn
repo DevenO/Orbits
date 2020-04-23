@@ -1,0 +1,434 @@
+[gd_scene load_steps=11 format=2]
+
+[ext_resource path="res://start_screen.gd" type="Script" id=1]
+[ext_resource path="res://new_buttongroup.tres" type="ButtonGroup" id=2]
+[ext_resource path="res://PanelContainer.gd" type="Script" id=3]
+[ext_resource path="res://KinematicBody2D.gd" type="Script" id=4]
+
+[sub_resource type="StyleBoxEmpty" id=1]
+
+[sub_resource type="StyleBoxEmpty" id=2]
+
+[sub_resource type="StyleBoxEmpty" id=3]
+
+[sub_resource type="StyleBoxEmpty" id=4]
+
+[sub_resource type="StyleBoxFlat" id=5]
+bg_color = Color( 0, 0, 0, 1 )
+
+[sub_resource type="StyleBoxFlat" id=6]
+bg_color = Color( 0.0980392, 0.0980392, 0.0980392, 1 )
+
+[node name="start_screen" type="Node2D"]
+script = ExtResource( 1 )
+
+[node name="option_container" type="VBoxContainer" parent="."]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 250.0
+margin_bottom = 190.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="basic_option" type="CheckButton" parent="option_container"]
+margin_right = 240.0
+margin_bottom = 42.0
+size_flags_vertical = 3
+custom_styles/focus = SubResource( 1 )
+pressed = true
+group = ExtResource( 2 )
+text = "Basic"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="perigee_option" type="CheckButton" parent="option_container"]
+margin_top = 46.0
+margin_right = 240.0
+margin_bottom = 88.0
+size_flags_vertical = 3
+custom_styles/focus = SubResource( 2 )
+group = ExtResource( 2 )
+text = "Perigee"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="apogee_option" type="CheckButton" parent="option_container"]
+margin_top = 92.0
+margin_right = 240.0
+margin_bottom = 134.0
+size_flags_vertical = 3
+custom_styles/focus = SubResource( 3 )
+group = ExtResource( 2 )
+text = "Apogee"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="no_v_option" type="CheckButton" parent="option_container"]
+margin_top = 138.0
+margin_right = 240.0
+margin_bottom = 180.0
+size_flags_vertical = 3
+custom_styles/focus = SubResource( 4 )
+group = ExtResource( 2 )
+text = "No Velocity"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="GridContainer" type="GridContainer" parent="."]
+margin_left = 10.0
+margin_top = 200.0
+margin_right = 250.0
+margin_bottom = 400.0
+columns = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="labels_container" type="VBoxContainer" parent="GridContainer"]
+margin_right = 132.0
+margin_bottom = 220.0
+size_flags_vertical = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label1" type="Label" parent="GridContainer/labels_container"]
+margin_top = 5.0
+margin_right = 132.0
+margin_bottom = 19.0
+size_flags_horizontal = 3
+size_flags_vertical = 6
+text = "Altitude (m): "
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label2" type="Label" parent="GridContainer/labels_container"]
+margin_top = 33.0
+margin_right = 132.0
+margin_bottom = 47.0
+size_flags_horizontal = 3
+size_flags_vertical = 6
+text = "Velocity (m/s):"
+valign = 1
+
+[node name="Label3" type="Label" parent="GridContainer/labels_container"]
+margin_top = 61.0
+margin_right = 132.0
+margin_bottom = 75.0
+size_flags_vertical = 6
+text = "Zenith Angle (deg):"
+
+[node name="Label4" type="Label" parent="GridContainer/labels_container"]
+margin_top = 89.0
+margin_right = 132.0
+margin_bottom = 103.0
+size_flags_vertical = 6
+text = "Starting Angle (deg):"
+valign = 1
+
+[node name="Label5" type="Label" parent="GridContainer/labels_container"]
+margin_top = 117.0
+margin_right = 132.0
+margin_bottom = 131.0
+size_flags_vertical = 6
+text = "Perigee Altitude (m):"
+
+[node name="Label6" type="Label" parent="GridContainer/labels_container"]
+margin_top = 145.0
+margin_right = 132.0
+margin_bottom = 159.0
+size_flags_vertical = 6
+text = "Apogee Altitude (m):"
+
+[node name="Label7" type="Label" parent="GridContainer/labels_container"]
+margin_top = 173.0
+margin_right = 132.0
+margin_bottom = 187.0
+size_flags_vertical = 6
+text = "Apogee Angle (deg):"
+
+[node name="Label8" type="Label" parent="GridContainer/labels_container"]
+margin_top = 201.0
+margin_right = 132.0
+margin_bottom = 215.0
+size_flags_vertical = 6
+text = "Period (hr):"
+
+[node name="values_container" type="VBoxContainer" parent="GridContainer"]
+margin_left = 136.0
+margin_right = 240.0
+margin_bottom = 220.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="start_altitude" type="SpinBox" parent="GridContainer/values_container"]
+margin_right = 104.0
+margin_bottom = 24.0
+size_flags_vertical = 3
+max_value = 0.0
+step = 0.0
+allow_greater = true
+allow_lesser = true
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="start_velocity" type="SpinBox" parent="GridContainer/values_container"]
+margin_top = 28.0
+margin_right = 104.0
+margin_bottom = 52.0
+size_flags_vertical = 3
+max_value = 0.0
+step = 0.0
+allow_greater = true
+align = 1
+
+[node name="start_zenith" type="SpinBox" parent="GridContainer/values_container"]
+margin_top = 56.0
+margin_right = 104.0
+margin_bottom = 80.0
+size_flags_vertical = 3
+max_value = 0.0
+step = 0.0
+allow_greater = true
+allow_lesser = true
+align = 1
+
+[node name="start_position_angle" type="SpinBox" parent="GridContainer/values_container"]
+margin_top = 84.0
+margin_right = 104.0
+margin_bottom = 108.0
+size_flags_vertical = 3
+max_value = 0.0
+step = 0.0
+allow_greater = true
+allow_lesser = true
+align = 1
+
+[node name="perigee_altitude" type="SpinBox" parent="GridContainer/values_container"]
+margin_top = 112.0
+margin_right = 104.0
+margin_bottom = 136.0
+size_flags_vertical = 3
+max_value = 0.0
+step = 0.0
+allow_greater = true
+allow_lesser = true
+align = 1
+editable = false
+
+[node name="apogee_altitude" type="SpinBox" parent="GridContainer/values_container"]
+margin_top = 140.0
+margin_right = 104.0
+margin_bottom = 164.0
+size_flags_vertical = 3
+max_value = 0.0
+step = 0.0
+allow_greater = true
+allow_lesser = true
+align = 1
+editable = false
+
+[node name="apogee_angle" type="SpinBox" parent="GridContainer/values_container"]
+margin_top = 168.0
+margin_right = 104.0
+margin_bottom = 192.0
+size_flags_vertical = 3
+max_value = 0.0
+step = 0.0
+allow_greater = true
+allow_lesser = true
+align = 1
+editable = false
+
+[node name="period" type="SpinBox" parent="GridContainer/values_container"]
+margin_top = 196.0
+margin_right = 104.0
+margin_bottom = 220.0
+size_flags_vertical = 3
+max_value = 0.0
+step = 0.0
+allow_greater = true
+allow_lesser = true
+align = 1
+editable = false
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+margin_left = 260.0
+margin_top = 10.0
+margin_right = 1240.0
+margin_bottom = 990.0
+custom_styles/panel = SubResource( 5 )
+script = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="KinematicBody2D" type="KinematicBody2D" parent="PanelContainer"]
+visible = false
+script = ExtResource( 4 )
+
+[node name="Button" type="Button" parent="."]
+margin_left = 10.0
+margin_top = 425.0
+margin_right = 240.0
+margin_bottom = 475.0
+text = "Start Simulation"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="running_container" type="PanelContainer" parent="."]
+visible = false
+margin_right = 250.0
+margin_bottom = 1000.0
+custom_styles/panel = SubResource( 6 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="running_container"]
+margin_top = 400.0
+margin_right = 250.0
+margin_bottom = 600.0
+size_flags_vertical = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="running_container/VBoxContainer"]
+margin_right = 250.0
+margin_bottom = 104.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="running_container/VBoxContainer/HBoxContainer"]
+margin_right = 129.0
+margin_bottom = 104.0
+size_flags_vertical = 4
+
+[node name="Label" type="Label" parent="running_container/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_right = 129.0
+margin_bottom = 14.0
+text = "Altitude (m):"
+
+[node name="Label2" type="Label" parent="running_container/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_top = 18.0
+margin_right = 129.0
+margin_bottom = 32.0
+text = "Velocity (m/s):"
+
+[node name="Label3" type="Label" parent="running_container/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_top = 36.0
+margin_right = 129.0
+margin_bottom = 50.0
+text = "Position angle (deg):"
+
+[node name="Label4" type="Label" parent="running_container/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_top = 54.0
+margin_right = 129.0
+margin_bottom = 68.0
+text = "Max alt. (m):"
+
+[node name="Label5" type="Label" parent="running_container/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_top = 72.0
+margin_right = 129.0
+margin_bottom = 86.0
+text = "Min alt. (m):"
+
+[node name="Label6" type="Label" parent="running_container/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_top = 90.0
+margin_right = 129.0
+margin_bottom = 104.0
+text = "Time elapsed (hr):"
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="running_container/VBoxContainer/HBoxContainer"]
+margin_left = 133.0
+margin_right = 161.0
+margin_bottom = 104.0
+size_flags_vertical = 4
+
+[node name="Altitude" type="Label" parent="running_container/VBoxContainer/HBoxContainer/VBoxContainer2"]
+margin_right = 28.0
+margin_bottom = 14.0
+text = "0.00"
+
+[node name="Velocity" type="Label" parent="running_container/VBoxContainer/HBoxContainer/VBoxContainer2"]
+margin_top = 18.0
+margin_right = 28.0
+margin_bottom = 32.0
+text = "0.00"
+
+[node name="Position_angle" type="Label" parent="running_container/VBoxContainer/HBoxContainer/VBoxContainer2"]
+margin_top = 36.0
+margin_right = 28.0
+margin_bottom = 50.0
+text = "0.00"
+
+[node name="Max_altitude" type="Label" parent="running_container/VBoxContainer/HBoxContainer/VBoxContainer2"]
+margin_top = 54.0
+margin_right = 28.0
+margin_bottom = 68.0
+text = "0.00"
+
+[node name="Min_altitude" type="Label" parent="running_container/VBoxContainer/HBoxContainer/VBoxContainer2"]
+margin_top = 72.0
+margin_right = 28.0
+margin_bottom = 86.0
+text = "0.00"
+
+[node name="time_elapsed" type="Label" parent="running_container/VBoxContainer/HBoxContainer/VBoxContainer2"]
+margin_top = 90.0
+margin_right = 28.0
+margin_bottom = 104.0
+text = "0.00"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="running_container/VBoxContainer"]
+margin_top = 108.0
+margin_right = 250.0
+margin_bottom = 200.0
+
+[node name="reset_time" type="Button" parent="running_container/VBoxContainer/VBoxContainer"]
+margin_right = 250.0
+margin_bottom = 20.0
+text = "Reset time"
+
+[node name="reset_mixmax" type="Button" parent="running_container/VBoxContainer/VBoxContainer"]
+margin_top = 24.0
+margin_right = 250.0
+margin_bottom = 44.0
+text = "Reset min/max"
+
+[node name="pause" type="Button" parent="running_container/VBoxContainer/VBoxContainer"]
+margin_top = 48.0
+margin_right = 250.0
+margin_bottom = 68.0
+text = "Pause"
+
+[node name="return_to_parameters" type="Button" parent="running_container/VBoxContainer/VBoxContainer"]
+margin_top = 72.0
+margin_right = 250.0
+margin_bottom = 92.0
+text = "Return to parameters"
+[connection signal="toggled" from="option_container/basic_option" to="." method="_on_basic_option_toggled"]
+[connection signal="toggled" from="option_container/perigee_option" to="." method="_on_perigee_option_toggled"]
+[connection signal="toggled" from="option_container/apogee_option" to="." method="_on_apogee_option_toggled"]
+[connection signal="toggled" from="option_container/no_v_option" to="." method="_on_no_v_option_toggled"]
+[connection signal="value_changed" from="GridContainer/values_container/start_altitude" to="." method="_value_update"]
+[connection signal="value_changed" from="GridContainer/values_container/start_velocity" to="." method="_value_update"]
+[connection signal="value_changed" from="GridContainer/values_container/start_zenith" to="." method="_value_update"]
+[connection signal="value_changed" from="GridContainer/values_container/start_position_angle" to="." method="_value_update"]
+[connection signal="value_changed" from="GridContainer/values_container/perigee_altitude" to="." method="_value_update"]
+[connection signal="value_changed" from="GridContainer/values_container/apogee_altitude" to="." method="_value_update"]
+[connection signal="value_changed" from="GridContainer/values_container/apogee_angle" to="." method="_value_update"]
+[connection signal="button_up" from="Button" to="." method="_on_sim_start_button_up"]
+[connection signal="button_up" from="running_container/VBoxContainer/VBoxContainer/reset_time" to="." method="_on_reset_time_button_up"]
+[connection signal="button_up" from="running_container/VBoxContainer/VBoxContainer/reset_mixmax" to="." method="_on_reset_mixmax_button_up"]
+[connection signal="button_up" from="running_container/VBoxContainer/VBoxContainer/pause" to="." method="_on_pause_button_up"]
+[connection signal="button_up" from="running_container/VBoxContainer/VBoxContainer/return_to_parameters" to="." method="_on_return_to_parameters_button_up"]
