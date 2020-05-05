@@ -1,5 +1,4 @@
-extends Node2D
-
+extends MarginContainer
 #variables  used in global calculations
 const mu = 3.9860050883e14 #GM constant, more accurate
 const eRadius = 6378140 #in m
@@ -60,73 +59,73 @@ var g_future_theta = 0.0
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	#initial values for SpinBoxes, block signals
-	for i in $GridContainer/values_container.get_children():
+	for i in $H/start_menu/values/spinboxes.get_children():
 		i.set_block_signals(true)
-	$GridContainer/values_container/start_altitude.value = 200000.0
-	$GridContainer/values_container/start_velocity.value = 9298.5214891594915
-	$GridContainer/values_container/start_zenith.value = 90
-	$GridContainer/values_container/start_position_angle.value = 45
-	for i in $GridContainer/values_container.get_children():
+	$H/start_menu/values/spinboxes/altitude.value = 200000.0
+	$H/start_menu/values/spinboxes/velocity.value = 9298.5214891594915
+	$H/start_menu/values/spinboxes/zenith.value = 90
+	$H/start_menu/values/spinboxes/start_angle.value = 45
+	for i in $H/start_menu/values/spinboxes.get_children():
 		i.set_block_signals(false)
+	
 	#run initial update
 	_value_update(0)
-	#update()
-
-#Toggle button actions
+	
+	#Toggle button actions
 func _on_basic_option_toggled(button_pressed):
 	if (button_pressed):
-		$GridContainer/values_container/start_altitude.editable = true
-		$GridContainer/values_container/start_velocity.editable = true
-		$GridContainer/values_container/start_zenith.editable = true
-		$GridContainer/values_container/start_position_angle.editable = true
-		$GridContainer/values_container/perigee_altitude.editable = false
-		$GridContainer/values_container/apogee_altitude.editable = false
-		$GridContainer/values_container/apogee_angle.editable = false
+		$H/start_menu/values/spinboxes/altitude.editable = true
+		$H/start_menu/values/spinboxes/velocity.editable = true
+		$H/start_menu/values/spinboxes/zenith.editable = true
+		$H/start_menu/values/spinboxes/start_angle.editable = true
+		$H/start_menu/values/spinboxes/perigee.editable = false
+		$H/start_menu/values/spinboxes/apogee.editable = false
+		$H/start_menu/values/spinboxes/apogee_angle.editable = false
 		mode = 1
 
 func _on_perigee_option_toggled(button_pressed):
 	if (button_pressed):
-		$GridContainer/values_container/start_altitude.editable = false
-		$GridContainer/values_container/start_velocity.editable = true
-		$GridContainer/values_container/start_zenith.editable = false
-		$GridContainer/values_container/start_position_angle.editable = true
-		$GridContainer/values_container/perigee_altitude.editable = true
-		$GridContainer/values_container/apogee_altitude.editable = false
-		$GridContainer/values_container/apogee_angle.editable = false
+		$H/start_menu/values/spinboxes/altitude.editable = false
+		$H/start_menu/values/spinboxes/velocity.editable = true
+		$H/start_menu/values/spinboxes/zenith.editable = false
+		$H/start_menu/values/spinboxes/start_angle.editable = true
+		$H/start_menu/values/spinboxes/perigee.editable = true
+		$H/start_menu/values/spinboxes/apogee.editable = false
+		$H/start_menu/values/spinboxes/apogee_angle.editable = false
 		mode = 2
 
 func _on_apogee_option_toggled(button_pressed):
 	if (button_pressed):
-		$GridContainer/values_container/start_altitude.editable = false
-		$GridContainer/values_container/start_velocity.editable = true
-		$GridContainer/values_container/start_zenith.editable = false
-		$GridContainer/values_container/start_position_angle.editable = true
-		$GridContainer/values_container/perigee_altitude.editable = false
-		$GridContainer/values_container/apogee_altitude.editable = true
-		$GridContainer/values_container/apogee_angle.editable = false
+		$H/start_menu/values/spinboxes/altitude.editable = false
+		$H/start_menu/values/spinboxes/velocity.editable = true
+		$H/start_menu/values/spinboxes/zenith.editable = false
+		$H/start_menu/values/spinboxes/start_angle.editable = true
+		$H/start_menu/values/spinboxes/perigee.editable = false
+		$H/start_menu/values/spinboxes/apogee.editable = true
+		$H/start_menu/values/spinboxes/apogee_angle.editable = false
 		mode = 3
 
 func _on_no_v_option_toggled(button_pressed):
 	if (button_pressed):
-		$GridContainer/values_container/start_altitude.editable = false
-		$GridContainer/values_container/start_velocity.editable = false
-		$GridContainer/values_container/start_zenith.editable = false
-		$GridContainer/values_container/start_position_angle.editable = false
-		$GridContainer/values_container/perigee_altitude.editable = true
-		$GridContainer/values_container/apogee_altitude.editable = true
-		$GridContainer/values_container/apogee_angle.editable = true
+		$H/start_menu/values/spinboxes/altitude.editable = false
+		$H/start_menu/values/spinboxes/velocity.editable = false
+		$H/start_menu/values/spinboxes/zenith.editable = false
+		$H/start_menu/values/spinboxes/start_angle.editable = false
+		$H/start_menu/values/spinboxes/perigee.editable = true
+		$H/start_menu/values/spinboxes/apogee.editable = true
+		$H/start_menu/values/spinboxes/apogee_angle.editable = true
 		mode = 4
 
 #Update all values function
 func _value_update(value):
-	altitude = $GridContainer/values_container/start_altitude.value
+	altitude = $H/start_menu/values/spinboxes/altitude.value
 	radius = altitude + eRadius
-	velocity = $GridContainer/values_container/start_velocity.value
-	zenith = deg2rad($GridContainer/values_container/start_zenith.value)
-	current_angle = deg2rad($GridContainer/values_container/start_position_angle.value)
-	apogee = $GridContainer/values_container/apogee_altitude.value + eRadius
-	perigee = $GridContainer/values_container/perigee_altitude.value + eRadius
-	apogee_angle = deg2rad($GridContainer/values_container/apogee_angle.value)
+	velocity = $H/start_menu/values/spinboxes/velocity.value
+	zenith = deg2rad($H/start_menu/values/spinboxes/zenith.value)
+	current_angle = deg2rad($H/start_menu/values/spinboxes/start_angle.value)
+	apogee = $H/start_menu/values/spinboxes/apogee.value + eRadius
+	perigee = $H/start_menu/values/spinboxes/perigee.value + eRadius
+	apogee_angle = deg2rad($H/start_menu/values/spinboxes/apogee_angle.value)
 	
 	#calculate other values based on the toggled input switch
 	match(mode):
@@ -209,27 +208,32 @@ func _value_update(value):
 	#period is always the same, regardless of mode - for now
 	semi_major = (apogee + perigee) / 2
 	period = 2*PI*pow(pow(semi_major,3)/mu,0.5)
-	$GridContainer/values_container/period.value = period/3600 #display hours
+	$H/start_menu/values/spinboxes/period.value = period/3600 #display hours
 	
 	#don't trigger emit signal when this block sets values
-	for i in $GridContainer/values_container.get_children():
+	for i in $H/start_menu/values/spinboxes.get_children():
 		i.set_block_signals(true)
-	$GridContainer/values_container/start_altitude.value = altitude
-	$GridContainer/values_container/start_velocity.value = velocity
-	$GridContainer/values_container/start_zenith.value = rad2deg(zenith)
-	$GridContainer/values_container/start_position_angle.value = rad2deg(current_angle)
-	$GridContainer/values_container/perigee_altitude.value = perigee - eRadius
-	$GridContainer/values_container/apogee_altitude.value = apogee - eRadius
-	$GridContainer/values_container/apogee_angle.value = rad2deg(apogee_angle)
+	$H/start_menu/values/spinboxes/altitude.value = altitude
+	$H/start_menu/values/spinboxes/velocity.value = velocity
+	$H/start_menu/values/spinboxes/zenith.value = rad2deg(zenith)
+	$H/start_menu/values/spinboxes/start_angle.value = rad2deg(current_angle)
+	$H/start_menu/values/spinboxes/perigee.value = perigee - eRadius
+	$H/start_menu/values/spinboxes/apogee.value = apogee - eRadius
+	$H/start_menu/values/spinboxes/apogee_angle.value = rad2deg(apogee_angle)
 	#turn signals back on
-	for i in $GridContainer/values_container.get_children():
+	for i in $H/start_menu/values/spinboxes.get_children():
 		i.set_block_signals(false)
-	
+		
 	#all parameters set, so calculate ellipse path, update draw function
 	_calc_path()
-	#set sat position for reference
-	#g_theta = current_angle + PI
-	#$PanelContainer/KinematicBody2D.position = Vector2($PanelContainer.get_rect().size.x/2+radius*sin(g_theta)/mscale,$PanelContainer.get_rect().size.y/2+radius*cos(g_theta)/mscale)
+	$H/simulation_container.update()
+	
+	var temp = $H/simulation_container/KinematicBody2D.position
+	temp = $H/simulation_container/KinematicBody2D.global_position
+	$H/simulation_container/KinematicBody2D.translate(Vector2($H/simulation_container.get_rect().size.x/2+radius*sin(g_theta)/mscale,$H/simulation_container.get_rect().size.y/2+radius*cos(g_theta)/mscale))
+	temp = $H/simulation_container/KinematicBody2D.position
+	temp = $H/simulation_container/KinematicBody2D.global_position
+	temp = $H/simulation_container/KinematicBody2D.to_global($H/simulation_container/KinematicBody2D.position)
 
 #calculate the predicted orbital path
 func _calc_path():
@@ -266,11 +270,11 @@ func _calc_path():
 		path_points[counter].y = ytemp*cos(rotate_angle) + xtemp*sin(rotate_angle)
 		counter += 1
 	
-	mscale = apogee*2.4/$PanelContainer.get_rect().size.x
+	mscale = apogee*2.4/min($H/simulation_container.get_rect().size.x, $H/simulation_container.get_rect().size.y)
 	counter = 0
 	for i in path_points:
-		plot_points[counter].x = $PanelContainer.get_rect().size.x/2 + i.x/mscale
-		plot_points[counter].y = $PanelContainer.get_rect().size.y/2 - i.y/mscale
+		plot_points[counter].x = $H/simulation_container.get_rect().size.x/2 + i.x/mscale
+		plot_points[counter].y = $H/simulation_container.get_rect().size.y/2 - i.y/mscale
 		counter += 1
 
 #Simulation functions
@@ -278,17 +282,26 @@ func _calc_path():
 func _on_sim_start_button_up():
 	#in case nothing ran this prior to pressing the button
 	_value_update(0)
-	#fade in the new menu
-	$running_container.visible = true
+	#change visibility
+	$H/start_menu.visible = false
+	$running_menu.visible = true
+	
+	#redraw due to new window size.
+	yield(get_tree().create_timer(0.05),"timeout")
+	_calc_path()
+	$H/simulation_container.update()
+	
+	#fade in new menu
 	var temp = 0
 	while temp <= 1.05:
-		$running_container.modulate.a = temp
+		$running_menu.modulate.a = temp
 		temp = temp + 0.05
 		yield(get_tree().create_timer(0.05), "timeout")
 	
+	
 	#start the physics simulation
+	$H/simulation_container/KinematicBody2D.position = Vector2(0,0)
 	active = true
-	$PanelContainer/KinematicBody2D.visible = true
 	x_pos = radius*sin(-current_angle)
 	y_pos = radius*cos(-current_angle)
 	x_vel = velocity*sin(-current_angle+zenith)
@@ -299,9 +312,9 @@ func _on_sim_start_button_up():
 	y_acc = g_acc*cos(g_theta)
 	max_alt = altitude
 	min_alt = altitude
-	$running_container/VBoxContainer/HBoxContainer/VBoxContainer2/Max_altitude.text = str(max_alt)
-	$running_container/VBoxContainer/HBoxContainer/VBoxContainer2/Min_altitude.text = str(min_alt)
-	$running_container/VBoxContainer/VBoxContainer/pause.text = "Pause"
+	$running_menu/H/values/max_altitude.text = str(max_alt)
+	$running_menu/H/values/min_altitude.text = str(min_alt)
+	$running_menu/pause.text = "Pause"
 
 #Physics simulation, processed 60 times / second
 func _physics_process(delta):
@@ -309,17 +322,23 @@ func _physics_process(delta):
 		if return_to_parameters == true: #return to parameters if button has been pressed
 			
 			#don't trigger emit signal when this block sets values. Only need to set things that have changed during the simulation
-			for i in $GridContainer/values_container.get_children():
+			for i in $H/start_menu/values/spinboxes.get_children():
 				i.set_block_signals(true)
-			$GridContainer/values_container/start_altitude.value = altitude
-			$GridContainer/values_container/start_velocity.value = velocity
-			$GridContainer/values_container/start_zenith.value = rad2deg(zenith)
-			$GridContainer/values_container/start_position_angle.value = rad2deg(current_angle)
+			$H/start_menu/values/spinboxes/altitude.value = altitude
+			$H/start_menu/values/spinboxes/velocity.value = velocity
+			$H/start_menu/values/spinboxes/zenith.value = rad2deg(zenith)
+			$H/start_menu/values/spinboxes/start_angle.value = rad2deg(current_angle)
 			#turn signals back on
-			for i in $GridContainer/values_container.get_children():
+			for i in $H/start_menu/values/spinboxes.get_children():
 				i.set_block_signals(false)
 			
-			$running_container.visible = false #disable visibility of simulation info layer
+			$running_menu.visible = false #disable visibility of simulation info layer
+			$H/start_menu.visible = true
+
+			#redraw due to new window size.
+			yield(get_tree().create_timer(0.05),"timeout")
+			_calc_path()
+			$H/simulation_container.update()
 			return_to_parameters = false #only need to run this section once
 		else:
 			pass
@@ -354,42 +373,42 @@ func _physics_process(delta):
 			#check max and min radii
 			if (radius-eRadius) > max_alt:
 				max_alt = radius-eRadius
-				$running_container/VBoxContainer/HBoxContainer/VBoxContainer2/Max_altitude.text = str(max_alt)
+				$running_menu/H/values/max_altitude.text = str(max_alt)
 			elif (radius-eRadius) < min_alt:
 				min_alt = radius-eRadius
-				$running_container/VBoxContainer/HBoxContainer/VBoxContainer2/Min_altitude.text = str(min_alt)
+				$running_menu/H/values/min_altitude.text = str(min_alt)
 
 		altitude = radius - eRadius
-		$running_container/VBoxContainer/HBoxContainer/VBoxContainer2/Altitude.text = str(altitude)
+		$running_menu/H/values/altitude.text = str(altitude)
 		velocity = pow(pow(x_vel,2)+pow(y_vel,2),0.5)
-		$running_container/VBoxContainer/HBoxContainer/VBoxContainer2/Velocity.text = str(velocity)
+		$running_menu/H/values/velocity.text = str(velocity)
 		zenith = asin((perigee*v_perigee)/(radius*velocity))
 		if zenith != zenith: #check for divide by zero
 			zenith = PI/2
 		current_angle = atan2(y_pos,x_pos)-(PI/2)
 		if current_angle < 0:
 			current_angle = current_angle + 2*PI
-		$running_container/VBoxContainer/HBoxContainer/VBoxContainer2/Position_angle.text = str(rad2deg(current_angle))
-		$PanelContainer/KinematicBody2D.position = Vector2($PanelContainer.get_rect().size.x/2+radius*sin(g_theta)/mscale,$PanelContainer.get_rect().size.y/2+radius*cos(g_theta)/mscale)
-		$running_container/VBoxContainer/HBoxContainer/VBoxContainer2/time_elapsed.text = str(time/3600) #display in hours
+		$running_menu/H/values/position_angle.text = str(rad2deg(current_angle))
+		$H/simulation_container/KinematicBody2D.position = Vector2($H/simulation_container.get_rect().size.x/2+radius*sin(g_theta)/mscale,$H/simulation_container.get_rect().size.y/2+radius*cos(g_theta)/mscale)
+		$running_menu/H/values/time_elapsed.text = str(time/3600) #display in hours
 
 func _on_reset_mixmax_button_up():
 	min_alt = altitude
-	$running_container/VBoxContainer/HBoxContainer/VBoxContainer2/Min_altitude.text = str(min_alt)
+	$running_menu/H/values/min_altitude.text = str(min_alt)
 	max_alt = altitude
-	$running_container/VBoxContainer/HBoxContainer/VBoxContainer2/Max_altitude.text = str(max_alt)
+	$running_menu/H/values/max_altitude.text = str(max_alt)
 
 func _on_reset_time_button_up():
 	time = 0
-	$running_container/VBoxContainer/HBoxContainer/VBoxContainer2/time_elapsed.text = str(time/3600)
+	$running_menu/H/values/time_elapsed.text = str(time/3600)
 
 func _on_pause_button_up():
 	if active == true:
 		active = false
-		$running_container/VBoxContainer/VBoxContainer/pause.text = "Unpause"
+		$running_menu/pause.text = "Unpause"
 	else:
 		active = true
-		$running_container/VBoxContainer/VBoxContainer/pause.text = "Pause"
+		$running_menu/pause.text = "Pause"
 
 func _on_return_to_parameters_button_up():
 	active = false
