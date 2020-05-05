@@ -227,13 +227,10 @@ func _value_update(value):
 	#all parameters set, so calculate ellipse path, update draw function
 	_calc_path()
 	$H/simulation_container.update()
-	
-	var temp = $H/simulation_container/KinematicBody2D.position
-	temp = $H/simulation_container/KinematicBody2D.global_position
-	$H/simulation_container/KinematicBody2D.translate(Vector2($H/simulation_container.get_rect().size.x/2+radius*sin(g_theta)/mscale,$H/simulation_container.get_rect().size.y/2+radius*cos(g_theta)/mscale))
-	temp = $H/simulation_container/KinematicBody2D.position
-	temp = $H/simulation_container/KinematicBody2D.global_position
-	temp = $H/simulation_container/KinematicBody2D.to_global($H/simulation_container/KinematicBody2D.position)
+	g_theta = current_angle + PI
+	var x = $H/simulation_container.get_rect().size.x/2+radius*sin(g_theta)/mscale
+	var y = $H/simulation_container.get_rect().size.y/2+radius*cos(g_theta)/mscale
+	$H/simulation_container/Node2D.position = Vector2(x,y)
 
 #calculate the predicted orbital path
 func _calc_path():
@@ -290,6 +287,9 @@ func _on_sim_start_button_up():
 	yield(get_tree().create_timer(0.05),"timeout")
 	_calc_path()
 	$H/simulation_container.update()
+	var x = $H/simulation_container.get_rect().size.x/2+radius*sin(g_theta)/mscale
+	var y = $H/simulation_container.get_rect().size.y/2+radius*cos(g_theta)/mscale
+	$H/simulation_container/Node2D.position = Vector2(x,y)
 	
 	#fade in new menu
 	var temp = 0
@@ -300,7 +300,6 @@ func _on_sim_start_button_up():
 	
 	
 	#start the physics simulation
-	$H/simulation_container/KinematicBody2D.position = Vector2(0,0)
 	active = true
 	x_pos = radius*sin(-current_angle)
 	y_pos = radius*cos(-current_angle)
@@ -339,6 +338,9 @@ func _physics_process(delta):
 			yield(get_tree().create_timer(0.05),"timeout")
 			_calc_path()
 			$H/simulation_container.update()
+			var x = $H/simulation_container.get_rect().size.x/2+radius*sin(g_theta)/mscale
+			var y = $H/simulation_container.get_rect().size.y/2+radius*cos(g_theta)/mscale
+			$H/simulation_container/Node2D.position = Vector2(x,y)
 			return_to_parameters = false #only need to run this section once
 		else:
 			pass
@@ -389,7 +391,9 @@ func _physics_process(delta):
 		if current_angle < 0:
 			current_angle = current_angle + 2*PI
 		$running_menu/H/values/position_angle.text = str(rad2deg(current_angle))
-		$H/simulation_container/KinematicBody2D.position = Vector2($H/simulation_container.get_rect().size.x/2+radius*sin(g_theta)/mscale,$H/simulation_container.get_rect().size.y/2+radius*cos(g_theta)/mscale)
+		var x = $H/simulation_container.get_rect().size.x/2+radius*sin(g_theta)/mscale
+		var y = $H/simulation_container.get_rect().size.y/2+radius*cos(g_theta)/mscale
+		$H/simulation_container/Node2D.position = Vector2(x,y)
 		$running_menu/H/values/time_elapsed.text = str(time/3600) #display in hours
 
 func _on_reset_mixmax_button_up():

@@ -48,21 +48,21 @@ margin_top = 44.0
 margin_right = 261.0
 margin_bottom = 84.0
 group = ExtResource( 2 )
-text = "Basic"
+text = "Perigee"
 
 [node name="option_apogee" type="CheckButton" parent="H/start_menu/options"]
 margin_top = 88.0
 margin_right = 261.0
 margin_bottom = 128.0
 group = ExtResource( 2 )
-text = "Basic"
+text = "Apogee"
 
 [node name="option_no_velocity" type="CheckButton" parent="H/start_menu/options"]
 margin_top = 132.0
 margin_right = 261.0
 margin_bottom = 172.0
 group = ExtResource( 2 )
-text = "Basic"
+text = "No Velocity"
 
 [node name="values" type="HBoxContainer" parent="H/start_menu"]
 margin_top = 176.0
@@ -229,7 +229,7 @@ size_flags_stretch_ratio = 4.0
 custom_styles/panel = SubResource( 1 )
 script = ExtResource( 4 )
 
-[node name="KinematicBody2D" type="KinematicBody2D" parent="H/simulation_container"]
+[node name="Node2D" type="Node2D" parent="H/simulation_container"]
 script = ExtResource( 3 )
 
 [node name="running_menu" type="VBoxContainer" parent="."]
