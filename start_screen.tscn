@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://start_screen.gd" type="Script" id=1]
 [ext_resource path="res://buttonGroup.tres" type="ButtonGroup" id=2]
 [ext_resource path="res://KinematicBody2D.gd" type="Script" id=3]
 [ext_resource path="res://simulation_container.gd" type="Script" id=4]
+[ext_resource path="res://Moon.gd" type="Script" id=5]
 
 [sub_resource type="StyleBoxFlat" id=1]
 bg_color = Color( 0, 0, 0, 1 )
@@ -220,6 +221,13 @@ margin_right = 261.0
 margin_bottom = 420.0
 text = "Start Simulation"
 
+[node name="moon_on_button" type="CheckButton" parent="H/start_menu"]
+margin_top = 424.0
+margin_right = 261.0
+margin_bottom = 464.0
+pressed = true
+text = "Simulate Moon"
+
 [node name="simulation_container" type="PanelContainer" parent="H"]
 margin_left = 265.0
 margin_right = 1230.0
@@ -232,64 +240,80 @@ script = ExtResource( 4 )
 [node name="Node2D" type="Node2D" parent="H/simulation_container"]
 script = ExtResource( 3 )
 
+[node name="Moon" type="Node2D" parent="H/simulation_container"]
+script = ExtResource( 5 )
+
 [node name="running_menu" type="VBoxContainer" parent="."]
 visible = false
-margin_right = 200.0
-margin_bottom = 200.0
+margin_right = 261.0
+margin_bottom = 246.0
 rect_min_size = Vector2( 200, 0 )
 rect_clip_content = true
 size_flags_horizontal = 0
 size_flags_vertical = 0
 
 [node name="H" type="HBoxContainer" parent="running_menu"]
-margin_right = 185.0
-margin_bottom = 104.0
+margin_right = 261.0
+margin_bottom = 150.0
 size_flags_horizontal = 0
 size_flags_vertical = 0
 
 [node name="labels" type="VBoxContainer" parent="running_menu/H"]
-margin_right = 131.0
-margin_bottom = 104.0
+margin_right = 183.0
+margin_bottom = 150.0
 
 [node name="Label" type="Label" parent="running_menu/H/labels"]
-margin_right = 131.0
+margin_right = 183.0
 margin_bottom = 14.0
 text = "Altitude (m):"
 
 [node name="Label2" type="Label" parent="running_menu/H/labels"]
 margin_top = 18.0
-margin_right = 131.0
+margin_right = 183.0
 margin_bottom = 32.0
 text = "Velocity (m/s):"
 
 [node name="Label3" type="Label" parent="running_menu/H/labels"]
 margin_top = 36.0
-margin_right = 131.0
+margin_right = 183.0
 margin_bottom = 50.0
 text = "Position Angle (deg):"
 
 [node name="Label4" type="Label" parent="running_menu/H/labels"]
 margin_top = 54.0
-margin_right = 131.0
+margin_right = 183.0
 margin_bottom = 68.0
 text = "Max Altitude (m):"
 
 [node name="Label5" type="Label" parent="running_menu/H/labels"]
 margin_top = 72.0
-margin_right = 131.0
+margin_right = 183.0
 margin_bottom = 86.0
 text = "Min Altitude (m):"
 
 [node name="Label6" type="Label" parent="running_menu/H/labels"]
 margin_top = 90.0
-margin_right = 131.0
+margin_right = 183.0
 margin_bottom = 104.0
-text = "Time Elapsed (hr):"
+text = "Stopwatch Time Elapsed (hr):"
+
+[node name="Label7" type="Label" parent="running_menu/H/labels"]
+margin_top = 108.0
+margin_right = 183.0
+margin_bottom = 122.0
+text = "Zenith Angle (deg):"
+
+[node name="Label8" type="Label" parent="running_menu/H/labels"]
+margin_top = 126.0
+margin_right = 183.0
+margin_bottom = 140.0
+size_flags_vertical = 0
+text = "Steps / Frame"
 
 [node name="values" type="VBoxContainer" parent="running_menu/H"]
-margin_left = 135.0
-margin_right = 185.0
-margin_bottom = 104.0
+margin_left = 187.0
+margin_right = 261.0
+margin_bottom = 150.0
 size_flags_horizontal = 0
 size_flags_vertical = 0
 
@@ -337,7 +361,7 @@ size_flags_horizontal = 0
 size_flags_vertical = 0
 text = "0.00"
 
-[node name="time_elapsed" type="Label" parent="running_menu/H/values"]
+[node name="stopwatch_time_elapsed" type="Label" parent="running_menu/H/values"]
 margin_top = 90.0
 margin_right = 50.0
 margin_bottom = 104.0
@@ -346,40 +370,62 @@ size_flags_horizontal = 0
 size_flags_vertical = 0
 text = "0.00"
 
-[node name="reset_time" type="Button" parent="running_menu"]
+[node name="zenith_angle" type="Label" parent="running_menu/H/values"]
 margin_top = 108.0
+margin_right = 50.0
+margin_bottom = 122.0
+rect_min_size = Vector2( 50, 0 )
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "0.00"
+
+[node name="steps_per_frame" type="SpinBox" parent="running_menu/H/values"]
+margin_top = 126.0
+margin_right = 74.0
+margin_bottom = 150.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+min_value = 100.0
+max_value = 5000.0
+step = 100.0
+value = 500.0
+rounded = true
+
+[node name="reset_time" type="Button" parent="running_menu"]
+margin_top = 154.0
 margin_right = 200.0
-margin_bottom = 128.0
+margin_bottom = 174.0
 rect_min_size = Vector2( 200, 0 )
 size_flags_horizontal = 0
 size_flags_vertical = 0
 text = "Reset Time"
 
 [node name="reset_minmax" type="Button" parent="running_menu"]
-margin_top = 132.0
+margin_top = 178.0
 margin_right = 200.0
-margin_bottom = 152.0
+margin_bottom = 198.0
 rect_min_size = Vector2( 200, 0 )
 size_flags_horizontal = 0
 size_flags_vertical = 0
 text = "Reset Min/Max"
 
 [node name="pause" type="Button" parent="running_menu"]
-margin_top = 156.0
+margin_top = 202.0
 margin_right = 200.0
-margin_bottom = 176.0
+margin_bottom = 222.0
 rect_min_size = Vector2( 200, 0 )
 size_flags_horizontal = 0
 size_flags_vertical = 0
 text = "Pause"
 
 [node name="return_to_parameters" type="Button" parent="running_menu"]
-margin_top = 180.0
+margin_top = 226.0
 margin_right = 200.0
-margin_bottom = 200.0
+margin_bottom = 246.0
 rect_min_size = Vector2( 200, 0 )
 size_flags_horizontal = 0
 size_flags_vertical = 0
+disabled = true
 text = "Return To Parameters"
 [connection signal="toggled" from="H/start_menu/options/option_basic" to="." method="_on_basic_option_toggled"]
 [connection signal="toggled" from="H/start_menu/options/option_perigee" to="." method="_on_perigee_option_toggled"]
@@ -393,6 +439,7 @@ text = "Return To Parameters"
 [connection signal="value_changed" from="H/start_menu/values/spinboxes/apogee" to="." method="_value_update"]
 [connection signal="value_changed" from="H/start_menu/values/spinboxes/apogee_angle" to="." method="_value_update"]
 [connection signal="button_up" from="H/start_menu/Button" to="." method="_on_sim_start_button_up"]
+[connection signal="button_up" from="H/start_menu/moon_on_button" to="." method="_on_moon_on_button_button_up"]
 [connection signal="button_up" from="running_menu/reset_time" to="." method="_on_reset_time_button_up"]
 [connection signal="button_up" from="running_menu/reset_minmax" to="." method="_on_reset_mixmax_button_up"]
 [connection signal="button_up" from="running_menu/pause" to="." method="_on_pause_button_up"]

@@ -15,7 +15,7 @@ _global_script_class_icons={
 
 [application]
 
-config/name="VV4"
+config/name="VV4 - moon"
 run/main_scene="res://start_screen.tscn"
 config/icon="res://icon.png"
 

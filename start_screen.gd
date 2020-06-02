@@ -1,7 +1,16 @@
 extends MarginContainer
 #variables  used in global calculations
-const mu = 3.9860050883e14 #GM constant, more accurate
-const eRadius = 6378140 #in m
+const mu = 3.9860050883e14 #GM constant for earth
+const eRadius = 6378140 #earth radius, in m
+const mumoon = 4.902794e12 #GM constant for the moon
+const mRadius = 1737400 #moon radius, in m
+
+#moon's orbital path parameters. Assuming fixed, pre-determined path for now
+var moon_perigee = 376805182.0 #assumed to start at perigee, and at 0 degree position
+var moon_apogee = 376805182.0 #assuming circular orbit for simplicity, for now. This sets period to approximately the right value
+var moon_omega = 2*PI/(655.71986459790094*60*60) #This is the angular velocity, which is fixed for a circular orbit. The period is pulled from the simulator manually, then converted to seconds
+var moon_x = 0.0 #x coordinate in meters for moon position from earth's center
+var moon_y = 0.0 #y coordinate in meters for moon position from earth's center
 
 #current satellite parameters
 var altitude = 0.0 #meters, current height above surface level
@@ -30,13 +39,18 @@ var plot_points = PoolVector2Array() #the points of the path ellipse (pixels)
 #simulation parameters
 var active = false #set to true when the start button is pressed
 var steps_per_frame = 500 #number of iterations to do per PHYSICS frame, which is always 60/sec
-var dt = 0.01 #interval between iterations. Not between frames - that is this value times steps_per_frame
-var time = 0.0 #elapsed simulation (not actual) time, seconds
+var dt = 0.1 #interval between iterations. Not between frames - that is this value times steps_per_frame
+var stopwatch_time = 0.0 #can be reset by user, elapsed simulation (not actual) time, seconds
 var return_to_parameters = false #set to true when return to parameters button is pressed. This ensures the current iteration finishes before returning.
+var time = 0.0 #cannot be reset, elapsed simulation (not actual) time, seconds
+var moon_on = true #include moon in sim or no?
 
 #new "Current" values for satellite
-var g_acc = 0.0 #acceleration due to gravity, magnitude
-var g_theta = 0.0 #direction of acceleration due to gravity
+var g_acc = 0.0 #acceleration due to gravity, magnitude (earth)
+var g_theta = 0.0 #direction of acceleration due to gravity (earth)
+var g_moon_acc = 0.0 #acceleration due to gravity, magnitude (moon)
+var g_moon_theta = 0.0 #direction of acceleration due to gravity (moon)
+
 var max_alt = 0.0 #maximum altitude acheived
 var min_alt = 0.0 #minimum altitude acheived
 
@@ -55,23 +69,27 @@ var y_acc_f = 0.0
 var future_radius = 0.0 #other important "future" values for the simulation. "Current" values will pull from original variables
 var g_future_acc = 0.0
 var g_future_theta = 0.0
+var moon_x_f = 0.0
+var moon_y_f = 0.0
+var g_future_moon_acc = 0.0
+var g_future_moon_theta = 0.0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	#initial values for SpinBoxes, block signals
 	for i in $H/start_menu/values/spinboxes.get_children():
 		i.set_block_signals(true)
-	$H/start_menu/values/spinboxes/altitude.value = 200000.0
-	$H/start_menu/values/spinboxes/velocity.value = 9298.5214891594915
+	$H/start_menu/values/spinboxes/altitude.value = 375000000.0
+	$H/start_menu/values/spinboxes/velocity.value = 200.0
 	$H/start_menu/values/spinboxes/zenith.value = 90
-	$H/start_menu/values/spinboxes/start_angle.value = 45
+	$H/start_menu/values/spinboxes/start_angle.value = 0
 	for i in $H/start_menu/values/spinboxes.get_children():
 		i.set_block_signals(false)
 	
 	#run initial update
 	_value_update(0)
-	
-	#Toggle button actions
+
+#Toggle button actions
 func _on_basic_option_toggled(button_pressed):
 	if (button_pressed):
 		$H/start_menu/values/spinboxes/altitude.editable = true
@@ -127,6 +145,10 @@ func _value_update(value):
 	perigee = $H/start_menu/values/spinboxes/perigee.value + eRadius
 	apogee_angle = deg2rad($H/start_menu/values/spinboxes/apogee_angle.value)
 	
+	#make sure apogee is greater than perigee
+	if apogee < perigee:
+		apogee = perigee
+	
 	#calculate other values based on the toggled input switch
 	match(mode):
 		1:
@@ -160,7 +182,10 @@ func _value_update(value):
 						else:
 							true_anomaly = PI
 					else:
-						true_anomaly = acos(((semi_major/radius)*(1-pow(eccentricity,2))-1)/eccentricity)
+						if zenith < PI/2:
+							true_anomaly = acos(((semi_major/radius)*(1-pow(eccentricity,2))-1)/eccentricity)
+						else:
+							true_anomaly = -acos(((semi_major/radius)*(1-pow(eccentricity,2))-1)/eccentricity)
 					apogee_angle = true_anomaly + current_angle - PI
 					if apogee_angle < 0:
 						apogee_angle = apogee_angle + 2*PI
@@ -231,6 +256,8 @@ func _value_update(value):
 	var x = $H/simulation_container.get_rect().size.x/2+radius*sin(g_theta)/mscale
 	var y = $H/simulation_container.get_rect().size.y/2+radius*cos(g_theta)/mscale
 	$H/simulation_container/Node2D.position = Vector2(x,y)
+	$H/simulation_container/Moon.position = Vector2($H/simulation_container.get_rect().size.x/2,$H/simulation_container.get_rect().size.y/2-moon_perigee/mscale) #moon always starts at 0 degrees at perigee
+	$H/simulation_container/Moon.update()
 
 #calculate the predicted orbital path
 func _calc_path():
@@ -274,7 +301,7 @@ func _calc_path():
 		plot_points[counter].y = $H/simulation_container.get_rect().size.y/2 - i.y/mscale
 		counter += 1
 
-#Simulation functions
+#SIMULATION FUNCTIONS start here
 #what happens when the sim start button is pressed
 func _on_sim_start_button_up():
 	#in case nothing ran this prior to pressing the button
@@ -284,7 +311,7 @@ func _on_sim_start_button_up():
 	$running_menu.visible = true
 	
 	#redraw due to new window size.
-	yield(get_tree().create_timer(0.05),"timeout")
+	yield(get_tree().create_timer(0.01),"timeout")
 	_calc_path()
 	$H/simulation_container.update()
 	var x = $H/simulation_container.get_rect().size.x/2+radius*sin(g_theta)/mscale
@@ -295,7 +322,7 @@ func _on_sim_start_button_up():
 	var temp = 0
 	while temp <= 1.05:
 		$running_menu.modulate.a = temp
-		temp = temp + 0.05
+		temp = temp + 0.5
 		yield(get_tree().create_timer(0.05), "timeout")
 	
 	
@@ -307,8 +334,22 @@ func _on_sim_start_button_up():
 	y_vel = velocity*cos(-current_angle+zenith)
 	g_acc = mu/pow(radius,2)
 	g_theta = current_angle + PI
-	x_acc = -g_acc*sin(g_theta)
-	y_acc = g_acc*cos(g_theta)
+	
+	if (moon_on):
+		moon_x = moon_apogee*sin(-moon_omega*time)
+		moon_y = moon_apogee*cos(-moon_omega*time)
+		if (x_pos == 0 and moon_x == 0):
+			g_moon_acc = mumoon/pow(y_pos-moon_y,2)
+		elif (y_pos == 0 and moon_y == 0):
+			g_moon_acc = mumoon/pow(x_pos-moon_x,2)
+		else:
+			g_moon_acc = mumoon/pow(pow(pow(x_pos-moon_x,2)+pow(y_pos-moon_y,2),0.5),2)
+		g_moon_theta = atan2(moon_y-y_pos,moon_x-x_pos)-PI/2
+	else:
+		g_moon_acc = 0.0
+	
+	x_acc = -g_acc*sin(g_theta) - g_moon_acc*sin(g_moon_theta)
+	y_acc = g_acc*cos(g_theta) + g_moon_acc*cos(g_moon_theta)
 	max_alt = altitude
 	min_alt = altitude
 	$running_menu/H/values/max_altitude.text = str(max_alt)
@@ -335,7 +376,7 @@ func _physics_process(delta):
 			$H/start_menu.visible = true
 
 			#redraw due to new window size.
-			yield(get_tree().create_timer(0.05),"timeout")
+			yield(get_tree().create_timer(0.01),"timeout")
 			_calc_path()
 			$H/simulation_container.update()
 			var x = $H/simulation_container.get_rect().size.x/2+radius*sin(g_theta)/mscale
@@ -353,8 +394,22 @@ func _physics_process(delta):
 			future_radius = pow(pow(x_pos_f,2)+pow(y_pos_f,2),0.5)
 			g_future_acc = mu/pow(future_radius,2)
 			g_future_theta = atan2(y_pos_f,x_pos_f) + PI/2
-			x_acc_f = -g_future_acc*sin(g_future_theta)
-			y_acc_f = g_future_acc*cos(g_future_theta)
+	
+			if (moon_on):
+				moon_x_f = moon_apogee*sin(-moon_omega*(time+dt))
+				moon_y_f = moon_apogee*cos(-moon_omega*(time+dt))
+				if (x_pos_f == 0 and moon_x_f == 0):
+					g_future_moon_acc = mumoon/pow(y_pos_f-moon_y_f,2)
+				elif (y_pos_f == 0 and moon_y_f == 0):
+					g_future_moon_acc = mumoon/pow(x_pos_f-moon_x_f,2)
+				else:
+					g_future_moon_acc = mumoon/pow(pow(pow(x_pos_f-moon_x_f,2)+pow(y_pos_f-moon_y_f,2),0.5),2)
+				g_future_moon_theta = atan2(moon_y_f-y_pos_f,moon_x_f-x_pos_f)-PI/2
+			else:
+				g_future_moon_acc = 0.0
+			
+			x_acc_f = -g_future_acc*sin(g_future_theta) - g_future_moon_acc*sin(g_future_moon_theta)
+			y_acc_f = g_future_acc*cos(g_future_theta) + g_future_moon_acc*cos(g_future_moon_theta)
 	
 			x_vel_f = x_vel + 0.5 * (x_acc + x_acc_f) * dt
 			y_vel_f = y_vel + 0.5 * (y_acc + y_acc_f) * dt
@@ -370,6 +425,12 @@ func _physics_process(delta):
 			g_acc = g_future_acc
 			g_theta = g_future_theta
 	
+			moon_x = moon_x_f
+			moon_y = moon_y_f
+			g_moon_acc = g_future_moon_acc
+			g_moon_theta = g_future_moon_theta
+	
+			stopwatch_time += dt
 			time += dt
 			i += 1
 			#check max and min radii
@@ -387,6 +448,11 @@ func _physics_process(delta):
 		zenith = asin((perigee*v_perigee)/(radius*velocity))
 		if zenith != zenith: #check for divide by zero
 			zenith = PI/2
+		
+		zenith = PI - (atan2(y_vel,x_vel) - PI/2) + g_theta
+		if zenith > 2*PI:
+			zenith = zenith - 2*PI
+		
 		current_angle = atan2(y_pos,x_pos)-(PI/2)
 		if current_angle < 0:
 			current_angle = current_angle + 2*PI
@@ -394,7 +460,12 @@ func _physics_process(delta):
 		var x = $H/simulation_container.get_rect().size.x/2+radius*sin(g_theta)/mscale
 		var y = $H/simulation_container.get_rect().size.y/2+radius*cos(g_theta)/mscale
 		$H/simulation_container/Node2D.position = Vector2(x,y)
-		$running_menu/H/values/time_elapsed.text = str(time/3600) #display in hours
+		x = $H/simulation_container.get_rect().size.x/2+moon_x/mscale
+		y = $H/simulation_container.get_rect().size.y/2-moon_y/mscale
+		$H/simulation_container/Moon.position = Vector2(x,y)
+		$running_menu/H/values/stopwatch_time_elapsed.text = str(stopwatch_time/3600) #display in hours
+		$running_menu/H/values/zenith_angle.text = str(rad2deg(zenith))
+		steps_per_frame = $running_menu/H/values/steps_per_frame.value
 
 func _on_reset_mixmax_button_up():
 	min_alt = altitude
@@ -403,8 +474,8 @@ func _on_reset_mixmax_button_up():
 	$running_menu/H/values/max_altitude.text = str(max_alt)
 
 func _on_reset_time_button_up():
-	time = 0
-	$running_menu/H/values/time_elapsed.text = str(time/3600)
+	stopwatch_time = 0
+	$running_menu/H/values/stopwatch_time_elapsed.text = str(stopwatch_time/3600)
 
 func _on_pause_button_up():
 	if active == true:
@@ -417,3 +488,15 @@ func _on_pause_button_up():
 func _on_return_to_parameters_button_up():
 	active = false
 	return_to_parameters = true
+
+func _on_moon_on_button_button_up():
+	if moon_on:
+		moon_on = false
+		$H/simulation_container/Moon.visible = false
+		dt = 0.01
+		$running_menu/return_to_parameters.disabled = false
+	else:
+		moon_on = true
+		$H/simulation_container/Moon.visible = true
+		dt = 0.1
+		$running_menu/return_to_parameters.disabled = true
