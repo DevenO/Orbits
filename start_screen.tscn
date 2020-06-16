@@ -82,7 +82,7 @@ margin_right = 132.0
 margin_bottom = 19.0
 size_flags_horizontal = 3
 size_flags_vertical = 6
-text = "Alittude (m):"
+text = "Altitude (m):"
 
 [node name="Label2" type="Label" parent="H/start_menu/values/labels"]
 margin_top = 33.0

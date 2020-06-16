@@ -176,6 +176,8 @@ func _value_update(value):
 					v_apogee = pow((2*mu*perigee)/(apogee*(apogee+perigee)),0.5)
 					v_perigee = pow((2*mu*apogee)/(perigee*(apogee+perigee)),0.5)
 					eccentricity = (perigee*v_perigee*v_perigee)/mu - 1
+					if eccentricity == 0:
+						eccentricity = 1
 					if zenith == PI/2: #prevent errors with true anomaly at exactly 0 or 180
 						if round(perigee) == round(radius):
 							true_anomaly = 0
